@@ -11,31 +11,20 @@ interface AppLoaderProps {
 const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
   const { active, progress } = useProgress();
   const [showLoader, setShowLoader] = useState(true);
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
-
-  useEffect(() => {
-    // Timer for minimum display duration
-    const timer = setTimeout(() => {
-      setMinTimeElapsed(true);
-    }, 3000); // 3 seconds
-
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     // Determine if the loader should still be shown
-    if ((active || progress < 100) || !minTimeElapsed) {
+    // Show loader if assets are actively loading or progress is not yet 100%
+    if (active || progress < 100) {
       setShowLoader(true);
     } else {
       setShowLoader(false);
     }
-  }, [active, progress, minTimeElapsed]);
+  }, [active, progress]);
 
   if (showLoader) {
-    // If loading is truly complete (progress is 100 and active is false)
-    // but minTime has not elapsed, we still show 100% progress.
-    const displayProgress = (progress === 100 && !active) ? 100 : progress;
-    return <StandaloneLoadingIndicator progress={displayProgress} />;
+    // Display the actual progress
+    return <StandaloneLoadingIndicator progress={progress} />;
   }
 
   return <>{children}</>;
